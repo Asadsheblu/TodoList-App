@@ -1,0 +1,97 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.input-container {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.input-container input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.input-container button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.task-counters {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.task-counters p {
+  margin: 5px 0;
+}
+
+.priority-filter {
+  margin-bottom: 20px;
+}
+
+.priority-filter label {
+  margin-right: 10px;
+}
+
+.priority-filter select {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.task-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.task-list li {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.task-list li.completed {
+  background-color: #e0e0e0;
+}
+
+.task-list li input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.task-list li span {
+  flex: 1;
+}
+
+.task-list li button {
+  padding: 8px 16px;
+  
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+}
+
