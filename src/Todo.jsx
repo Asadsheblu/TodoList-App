@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const initialTasks = [
   { id: 1, text: 'Task 1', completed: false, priority: 'low' },
@@ -10,18 +8,20 @@ const initialTasks = [
 
 const Todo = () => {
   const [tasks, setTasks] = useState([]);
+  const [newTaskText, setNewTaskText] = useState('');
 
   useEffect(() => {
     const storedTasks = localStorage.getItem('tasks');
     if (storedTasks) {
       setTasks(JSON.parse(storedTasks));
     } else {
-      // If no tasks are stored in localStorage, set initialTasks as default
       setTasks(initialTasks);
     }
   }, []);
 
-  const [newTaskText, setNewTaskText] = useState('');
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
 
   const addTask = () => {
     if (newTaskText.trim() !== '') {
@@ -34,19 +34,23 @@ const Todo = () => {
       const updatedTasks = [...tasks, newTask];
       setTasks(updatedTasks);
       setNewTaskText('');
-      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
     }
   };
 
-  // Function to delete a task with confirmation
-  const deleteTask = (taskId) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this task?');
-    if (confirmDelete) {
-      const updatedTasks = tasks.filter(task => task.id !== taskId);
-      setTasks(updatedTasks);
-      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    }
+  const toggleTaskCompletion = (taskId) => {
+    const updatedTasks = tasks.map(task =>
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    );
+    setTasks(updatedTasks);
   };
+
+  const deleteTask = (taskId) => {
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    setTasks(updatedTasks);
+  };
+
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(task => task.completed).length;
 
   return (
     <div className="App container">
@@ -63,13 +67,18 @@ const Todo = () => {
           <button className='btn btn-success' onClick={addTask}>Add Task</button>
         </div>
       </div>
+      <div>Total Tasks: {totalTasks}</div>
+      <div>Completed Tasks: {completedTasks}</div>
       <ul className="task-list">
         {tasks.map(task => (
           <li key={task.id} className={`priority-${task.priority} ${task.completed ? 'completed' : ''}`}>
-            <input type="checkbox" checked={task.completed} />
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => toggleTaskCompletion(task.id)}
+            />
             <span>{task.text}</span>
-            <button className='btn btn-primary'>Edit</button>
-            <button onClick={() => deleteTask(task.id)} className='btn btn-danger'>Delete</button>
+            <button className='btn btn-danger' onClick={() => deleteTask(task.id)}>Delete</button>
           </li>
         ))}
       </ul>
