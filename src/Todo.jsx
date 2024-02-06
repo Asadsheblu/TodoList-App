@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
+// Initial tasks data
 const initialTasks = [
   { id: 1, text: 'Task 1', completed: false, priority: 'low' },
   { id: 2, text: 'Task 2', completed: false, priority: 'medium' },
@@ -8,12 +9,14 @@ const initialTasks = [
 ];
 
 const Todo = () => {
+  // State variables
   const [tasks, setTasks] = useState([]);
   const [newTaskText, setNewTaskText] = useState('');
   const [editTaskText, setEditTaskText] = useState('');
   const [editTaskId, setEditTaskId] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Load tasks from localStorage on initial render
   useEffect(() => {
     const storedTasks = localStorage.getItem('tasks');
     if (storedTasks) {
@@ -23,6 +26,7 @@ const Todo = () => {
     }
   }, []);
 
+  // Add a new task
   const addTask = () => {
     if (newTaskText.trim() !== '') {
       const newTask = {
@@ -34,39 +38,44 @@ const Todo = () => {
       const updatedTasks = [...tasks, newTask];
       setTasks(updatedTasks);
       setNewTaskText('');
-      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks)); // Store tasks in localStorage
     }
   };
 
+  // Toggle task completion status
   const toggleTaskCompletion = (taskId) => {
     const updatedTasks = tasks.map(task =>
       task.id === taskId ? { ...task, completed: !task.completed } : task
     );
     setTasks(updatedTasks);
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks)); // Store tasks in localStorage
   };
 
+  // Delete a task
   const deleteTask = (taskId) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this task?');
     if (confirmDelete) {
       const updatedTasks = tasks.filter(task => task.id !== taskId);
       setTasks(updatedTasks);
-      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks)); // Store tasks in localStorage
     }
   };
 
+  // Open edit modal with task details
   const openEditModal = (taskId, taskText) => {
     setEditTaskId(taskId);
     setEditTaskText(taskText);
     setIsEditModalOpen(true);
   };
 
+  // Close edit modal
   const closeEditModal = () => {
     setEditTaskId(null);
     setEditTaskText('');
     setIsEditModalOpen(false);
   };
 
+  // Update task with edited text
   const updateTask = () => {
     const updatedTasks = tasks.map(task =>
       task.id === editTaskId ? { ...task, text: editTaskText } : task
@@ -76,10 +85,14 @@ const Todo = () => {
     setEditTaskId(null);
     setEditTaskText('');
     toast.success('Task updated successfully');
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks)); // Store tasks in localStorage
   };
+
+  // Count total tasks and completed tasks
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(task => task.completed).length;
+
+  // Render the component
   return (
     <div className="App container">
       <h1>Todo List</h1>
