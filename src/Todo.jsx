@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 const initialTasks = [
   { id: 1, text: 'Task 1', completed: false, priority: 'low' },
@@ -9,6 +10,9 @@ const initialTasks = [
 const Todo = () => {
   const [tasks, setTasks] = useState([]);
   const [newTaskText, setNewTaskText] = useState('');
+  const [editTaskText, setEditTaskText] = useState('');
+  const [editTaskId, setEditTaskId] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     const storedTasks = localStorage.getItem('tasks');
@@ -18,10 +22,6 @@ const Todo = () => {
       setTasks(initialTasks);
     }
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }, [tasks]);
 
   const addTask = () => {
     if (newTaskText.trim() !== '') {
@@ -34,6 +34,7 @@ const Todo = () => {
       const updatedTasks = [...tasks, newTask];
       setTasks(updatedTasks);
       setNewTaskText('');
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
     }
   };
 
@@ -42,16 +43,43 @@ const Todo = () => {
       task.id === taskId ? { ...task, completed: !task.completed } : task
     );
     setTasks(updatedTasks);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 
   const deleteTask = (taskId) => {
-    const updatedTasks = tasks.filter(task => task.id !== taskId);
-    setTasks(updatedTasks);
+    const confirmDelete = window.confirm('Are you sure you want to delete this task?');
+    if (confirmDelete) {
+      const updatedTasks = tasks.filter(task => task.id !== taskId);
+      setTasks(updatedTasks);
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    }
   };
 
+  const openEditModal = (taskId, taskText) => {
+    setEditTaskId(taskId);
+    setEditTaskText(taskText);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setEditTaskId(null);
+    setEditTaskText('');
+    setIsEditModalOpen(false);
+  };
+
+  const updateTask = () => {
+    const updatedTasks = tasks.map(task =>
+      task.id === editTaskId ? { ...task, text: editTaskText } : task
+    );
+    setTasks(updatedTasks);
+    setIsEditModalOpen(false);
+    setEditTaskId(null);
+    setEditTaskText('');
+    toast.success('Task updated successfully');
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+  };
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(task => task.completed).length;
-
   return (
     <div className="App container">
       <h1>Todo List</h1>
@@ -67,8 +95,10 @@ const Todo = () => {
           <button className='btn btn-success' onClick={addTask}>Add Task</button>
         </div>
       </div>
-      <div>Total Tasks: {totalTasks}</div>
-      <div>Completed Tasks: {completedTasks}</div>
+      <div className="task-counters">
+        <p>Total Tasks: {totalTasks}</p>
+        <p>Completed Tasks: {completedTasks}</p>
+      </div>
       <ul className="task-list">
         {tasks.map(task => (
           <li key={task.id} className={`priority-${task.priority} ${task.completed ? 'completed' : ''}`}>
@@ -78,10 +108,24 @@ const Todo = () => {
               onChange={() => toggleTaskCompletion(task.id)}
             />
             <span>{task.text}</span>
+            <button className='btn btn-primary' onClick={() => openEditModal(task.id, task.text)}>Edit</button>
             <button className='btn btn-danger' onClick={() => deleteTask(task.id)}>Delete</button>
           </li>
         ))}
       </ul>
+      {isEditModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <input className='form-control'
+              type="text"
+              value={editTaskText}
+              onChange={(e) => setEditTaskText(e.target.value)}
+            />
+            <button className='btn btn-primary mt-2 mb-2' onClick={updateTask}>Update Task</button>
+            <button className='btn btn-danger' onClick={closeEditModal}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
