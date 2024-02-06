@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const initialTasks = [
   { id: 1, text: 'Task 1', completed: false, priority: 'low' },
@@ -36,6 +38,16 @@ const Todo = () => {
     }
   };
 
+  // Function to delete a task with confirmation
+  const deleteTask = (taskId) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this task?');
+    if (confirmDelete) {
+      const updatedTasks = tasks.filter(task => task.id !== taskId);
+      setTasks(updatedTasks);
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    }
+  };
+
   return (
     <div className="App container">
       <h1>Todo List</h1>
@@ -57,7 +69,7 @@ const Todo = () => {
             <input type="checkbox" checked={task.completed} />
             <span>{task.text}</span>
             <button className='btn btn-primary'>Edit</button>
-            <button className='btn btn-danger'>Delete</button>
+            <button onClick={() => deleteTask(task.id)} className='btn btn-danger'>Delete</button>
           </li>
         ))}
       </ul>
